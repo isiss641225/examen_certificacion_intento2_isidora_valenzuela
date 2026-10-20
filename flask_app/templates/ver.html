@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ver Entrada</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="browser-window">
+        <header class="browser-bar">
+            <span class="url">http://localhost:5000/ver/{{ entrada.id }}</span>
+        </header>
+
+        <main class="content">
+            <div class="top-bar">
+                <div></div>
+                <div>
+                    <a href="/dashboard">Inicio</a>
+                    <a href="/cerrar_sesion">Cerrar Sesión</a>
+                </div>
+            </div>
+
+            <h2>Entrada de {{ entrada.fecha_entrada.strftime('%Y-%m-%d') }}</h2>
+            <div class="view-box">
+                <p>{{ entrada.notas }}</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

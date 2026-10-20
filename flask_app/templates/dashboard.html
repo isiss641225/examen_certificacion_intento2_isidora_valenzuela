@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="browser-window">
+        <header class="browser-bar">
+            <span class="url">http://localhost:5000/dashboard</span>
+        </header>
+
+        <main class="content">
+            <div class="top-bar">
+                <h2>Bienvenid@, {{ session['nombre'] }}</h2>
+                <div class="nav-links">
+                    <a href="/nueva">Nueva Entrada</a>
+                    <a href="/cerrar_sesion">Cerrar Sesión</a>
+                </div>
+            </div>
+
+            <!-- BONUS BÚSQUEDA -->
+            <form action="/buscar" method="POST" class="search-form">
+                <input type="text" name="termino" placeholder="Término a Buscar">
+                <button type="submit">Buscar</button>
+            </form>
+
+            <div class="grid-entries">
+                {% for entrada in entradas %}
+                <div class="card">
+                    <p><strong>Entrada</strong><br>{{ entrada.fecha_entrada.strftime('%Y-%m-%d') }}</p>
+                    <div class="actions">
+                        <a href="/editar/{{ entrada.id }}"><button>Editar</button></a>
+                        <a href="/borrar/{{ entrada.id }}"><button>Borrar</button></a>
+                        <a href="/ver/{{ entrada.id }}"><button>Ver</button></a>
+                    </div>
+                </div>
+                {% else %}
+                    <p>No hay entradas registradas.</p>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</body>
+</html> 

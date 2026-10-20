@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva Entrada</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="browser-window">
+        <header class="browser-bar">
+            <span class="url">http://localhost:5000/nueva</span>
+        </header>
+
+        <main class="content">
+            <div class="top-bar">
+                <h2>Nueva Entrada</h2>
+                <div>
+                    <a href="/dashboard">Inicio</a>
+                    <a href="/cerrar_sesion">Cerrar Sesión</a>
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages(category_filter=["error_entrada"]) %}
+                {% if messages %}
+                    <ul class="errors">
+                    {% for msg in messages %}
+                        <li>{{ msg }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <form action="/nueva/crear" method="POST" class="form-container">
+                <label>Fecha Entrada: <input type="date" name="fecha_entrada"></label>
+                <label>Notas:</label>
+                <textarea name="notas" rows="6"></textarea>
+                <button type="submit">Guardar</button>
+            </form>
+        </main>
+    </div>
+</body>
+</html>

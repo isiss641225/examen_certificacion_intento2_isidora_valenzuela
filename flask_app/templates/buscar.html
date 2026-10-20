@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="browser-window">
+        <header class="browser-bar">
+            <span class="url">http://localhost:5000/buscar/{{ termino }}</span>
+        </header>
+
+        <main class="content">
+            <div class="top-bar">
+                <h2>Buscar</h2>
+                <div>
+                    <a href="/dashboard">Inicio</a>
+                    <a href="/cerrar_sesion">Cerrar Sesión</a>
+                </div>
+            </div>
+
+            <div class="grid-entries">
+                {% for entrada in entradas %}
+                <div class="card">
+                    <p><strong>Entrada</strong><br>{{ entrada.fecha_entrada.strftime('%Y-%m-%d') }}</p>
+                    <div class="actions">
+                        <a href="/editar/{{ entrada.id }}"><button>Editar</button></a>
+                        <a href="/borrar/{{ entrada.id }}"><button>Borrar</button></a>
+                        <a href="/ver/{{ entrada.id }}"><button>Ver</button></a>
+                    </div>
+                </div>
+                {% else %}
+                    <p>No se encontraron entradas con el término enviado.</p>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

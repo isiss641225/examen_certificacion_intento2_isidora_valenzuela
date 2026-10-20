@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>QueridoDiario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="browser-window">
+        <header class="browser-bar">
+            <span class="url">http://localhost:5000/</span>
+        </header>
+
+        <main class="content">
+            <h1>QueridoDiario</h1>
+            <div class="auth-grid">
+                <!-- REGISTRO -->
+                <div class="box">
+                    <h2>Registro</h2>
+                    {% with messages = get_flashed_messages(category_filter=["error_registro"]) %}
+                        {% if messages %}
+                            <ul class="errors">
+                            {% for msg in messages %}
+                                <li>{{ msg }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                    <form action="/registro" method="POST">
+                        <label>Nombre: <input type="text" name="nombre"></label>
+                        <label>Apellido: <input type="text" name="apellido"></label>
+                        <label>E-mail: <input type="text" name="email"></label>
+                        <label>Edad: <input type="number" name="edad"></label>
+                        <label>Contraseña: <input type="password" name="password"></label>
+                        <label>Conf. Contraseña: <input type="password" name="confirm_password"></label>
+                        <button type="submit">Registrar</button>
+                    </form>
+                </div>
+
+                <!-- INICIO SESIÓN -->
+                <div class="box">
+                    <h2>Inicio de Sesión</h2>
+                    {% with messages = get_flashed_messages(category_filter=["error_login"]) %}
+                        {% if messages %}
+                            <ul class="errors">
+                            {% for msg in messages %}
+                                <li>{{ msg }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                    <form action="/login" method="POST">
+                        <label>E-mail: <input type="text" name="email"></label>
+                        <label>Contraseña: <input type="password" name="password"></label>
+                        <button type="submit">Iniciar Sesión</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

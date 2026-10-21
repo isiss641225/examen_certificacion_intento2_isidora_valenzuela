@@ -2,45 +2,54 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - QueridoDiario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
-    <div class="browser-window">
-        <header class="browser-bar">
-            <span class="url">http://localhost:5000/dashboard</span>
+    <div class="container py-4">
+        <!-- Encabezado con saludo al usuario y barra de navegación -->
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h3 m-0">Bienvenid@, {{ usuario.nombre }}</h2>
+            <div>
+                <a href="/nueva" class="link-inicio">Nueva Entrada</a>
+                <a href="/logout" class="link-logout">Cerrar Sesión</a>
+            </div>
         </header>
 
-        <main class="content">
-            <div class="top-bar">
-                <h2>Bienvenid@, {{ session['nombre'] }}</h2>
-                <div class="nav-links">
-                    <a href="/nueva">Nueva Entrada</a>
-                    <a href="/cerrar_sesion">Cerrar Sesión</a>
-                </div>
+        <!-- Buscador general por palabra clave -->
+        <form action="/buscar" method="POST" class="row g-2 mb-4 align-items-center" style="max-width: 500px;">
+            <div class="col">
+                <input type="text" class="form-control" name="termino" placeholder="Término a Buscar" required>
             </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-custom-primary">Buscar</button>
+            </div>
+        </form>
 
-            <!-- BONUS BÚSQUEDA -->
-            <form action="/buscar" method="POST" class="search-form">
-                <input type="text" name="termino" placeholder="Término a Buscar">
-                <button type="submit">Buscar</button>
-            </form>
-
-            <div class="grid-entries">
-                {% for entrada in entradas %}
-                <div class="card">
-                    <p><strong>Entrada</strong><br>{{ entrada.fecha_entrada.strftime('%Y-%m-%d') }}</p>
-                    <div class="actions">
-                        <a href="/editar/{{ entrada.id }}"><button>Editar</button></a>
-                        <a href="/borrar/{{ entrada.id }}"><button>Borrar</button></a>
-                        <a href="/ver/{{ entrada.id }}"><button>Ver</button></a>
+        <!-- Listado dinámico de entradas del usuario logueado -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for entrada in entradas %}
+                <div class="col">
+                    <div class="custom-card p-3">
+                        <h5 class="fw-bold mb-3">Entrada {{ entrada.fecha.strftime('%Y-%m-%d') }}</h5>
+                        <!-- Opciones de CRUD para cada entrada -->
+                        <div class="d-flex gap-2">
+                            <a href="/editar/{{ entrada.id }}" class="btn-editar">Editar</a>
+                            <a href="/borrar/{{ entrada.id }}" class="btn-borrar" onclick="return confirm('¿Seguro que deseas borrar esta entrada?')">Borrar</a>
+                            <a href="/ver/{{ entrada.id }}" class="btn-ver">Ver</a>
+                        </div>
                     </div>
                 </div>
-                {% else %}
-                    <p>No hay entradas registradas.</p>
-                {% endfor %}
-            </div>
-        </main>
+            {% else %}
+                <!-- Mensaje alternativo cuando la lista está vacía -->
+                <div class="col-12">
+                    <p class="text-muted">No tienes entradas registradas aún.</p>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </body>
-</html> 
+</html>

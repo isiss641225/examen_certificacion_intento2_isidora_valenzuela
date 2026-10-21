@@ -4,8 +4,8 @@ class MySQLConnection:
     def __init__(self, db):
         connection = pymysql.connect(
             host='localhost',
-            user='root',    # Usuario dedicado creado recién
-            password='1234',      # La contraseña que le asignamos
+            user='root',
+            password='',
             db=db,
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor,
@@ -16,7 +16,8 @@ class MySQLConnection:
     def query_db(self, query, data=None):
         with self.connection.cursor() as cursor:
             try:
-                cursor.execute(query, data)
+                query = cursor.mogrify(query, data)
+                cursor.execute(query)
                 if query.lower().find("insert") >= 0:
                     self.connection.commit()
                     return cursor.lastrowid
@@ -25,6 +26,9 @@ class MySQLConnection:
                     return result
                 else:
                     self.connection.commit()
+            except Exception as e:
+                print("Algo salió mal:", e)
+                return False
             finally:
                 self.connection.close()
 

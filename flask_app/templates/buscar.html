@@ -2,39 +2,43 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Buscar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar - QueridoDiario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
-    <div class="browser-window">
-        <header class="browser-bar">
-            <span class="url">http://localhost:5000/buscar/{{ termino }}</span>
+    <div class="container py-4">
+        <!-- Encabezado superior -->
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h3 fw-bold m-0">Resultados de Búsqueda</h2>
+            <div>
+                <a href="/dashboard" class="link-inicio">Inicio</a>
+                <a href="/logout" class="link-logout">Cerrar Sesión</a>
+            </div>
         </header>
 
-        <main class="content">
-            <div class="top-bar">
-                <h2>Buscar</h2>
-                <div>
-                    <a href="/dashboard">Inicio</a>
-                    <a href="/cerrar_sesion">Cerrar Sesión</a>
-                </div>
-            </div>
-
-            <div class="grid-entries">
-                {% for entrada in entradas %}
-                <div class="card">
-                    <p><strong>Entrada</strong><br>{{ entrada.fecha_entrada.strftime('%Y-%m-%d') }}</p>
-                    <div class="actions">
-                        <a href="/editar/{{ entrada.id }}"><button>Editar</button></a>
-                        <a href="/borrar/{{ entrada.id }}"><button>Borrar</button></a>
-                        <a href="/ver/{{ entrada.id }}"><button>Ver</button></a>
+        <!-- Renderizado de las entradas filtradas que coinciden con el término -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for entrada in entradas %}
+                <div class="col">
+                    <div class="custom-card p-3">
+                        <h5 class="fw-bold mb-3">Entrada {{ entrada.fecha.strftime('%Y-%m-%d') }}</h5>
+                        <div class="d-flex gap-2">
+                            <a href="/editar/{{ entrada.id }}" class="btn-editar">Editar</a>
+                            <a href="/borrar/{{ entrada.id }}" class="btn-borrar" onclick="return confirm('¿Seguro que deseas borrar esta entrada?')">Borrar</a>
+                            <a href="/ver/{{ entrada.id }}" class="btn-ver">Ver</a>
+                        </div>
                     </div>
                 </div>
-                {% else %}
-                    <p>No se encontraron entradas con el término enviado.</p>
-                {% endfor %}
-            </div>
-        </main>
+            {% else %}
+                <!-- Mensaje de aviso cuando no hay coincidencias en la BD -->
+                <div class="col-12">
+                    <p class="text-muted">No se encontraron entradas que contengan el término "{{ termino }}".</p>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </body>
 </html>

@@ -3,9 +3,9 @@ USE db_querido_diario;
 
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(45) NOT NULL,
-    apellido VARCHAR(45) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    nombre VARCHAR(255) NOT NULL,
+    apellido VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     edad INT NOT NULL,
     password VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 CREATE TABLE IF NOT EXISTS entradas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    fecha_entrada DATE NOT NULL,
+    fecha DATE NOT NULL,
     notas TEXT NOT NULL,
     usuario_id INT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

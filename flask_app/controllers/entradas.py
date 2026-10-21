@@ -1,108 +1,124 @@
-from flask import render_template, redirect, request, session, flash
+from flask import render_template, request, redirect, session, flash
 from flask_app import app
 from flask_app.models.entrada import Entrada
+from flask_app.models.usuario import Usuario
 
-def usuario_autenticado():
-    return 'usuario_id' in session
-
+# Vista principal del usuario donde ve sus entradas
 @app.route('/dashboard')
 def dashboard():
-    if not usuario_autenticado():
-        flash("Debe haber iniciado sesión para ver esta página.", "error_login")
+    # Protección de ruta: no pueden entrar si no han iniciado sesión
+    if 'usuario_id' not in session:
         return redirect('/')
+    
+    usuario = Usuario.get_by_id({'id': session['usuario_id']})
+    # Se usa get_by_user que es como está nombrado en tu modelo entrada.py
+    entradas = Entrada.get_by_user({'usuario_id': session['usuario_id']})
+    
+    return render_template('dashboard.html', usuario=usuario, entradas=entradas)
 
-    entradas = Entrada.get_by_user_id({'usuario_id': session['usuario_id']})
-    return render_template('dashboard.html', entradas=entradas)
-
+# Renderiza la plantilla para crear una entrada nueva
 @app.route('/nueva')
 def nueva():
-    if not usuario_autenticado():
-        flash("El usuario debe haber iniciado sesión para ver esta página", "error_login")
+    if 'usuario_id' not in session:
         return redirect('/')
     return render_template('nueva.html')
 
-@app.route('/nueva/crear', methods=['POST'])
+# Recibe el formulario y guarda la nueva entrada
+@app.route('/crear_entrada', methods=['POST'])
 def crear_entrada():
-    if not usuario_autenticado():
+    if 'usuario_id' not in session:
         return redirect('/')
-
+    
+    # Validamos que la fecha sea obligatoria y no venga vacía
     if not Entrada.validar_entrada(request.form):
         return redirect('/nueva')
-
+    
     data = {
-        'fecha_entrada': request.form['fecha_entrada'],
+        'fecha': request.form['fecha'],
         'notas': request.form['notas'],
         'usuario_id': session['usuario_id']
     }
+    
     Entrada.save(data)
     return redirect('/dashboard')
 
+# Muestra una entrada específica
+@app.route('/ver/<int:id>')
+def ver(id):
+    if 'usuario_id' not in session:
+        return redirect('/')
+    
+    entrada = Entrada.get_by_id({'id': id})
+    
+    # Validación de seguridad: aseguramos que el usuario solo pueda ver sus propias notas
+    if not entrada or entrada.usuario_id != session['usuario_id']:
+        return redirect('/dashboard')
+        
+    return render_template('ver.html', entrada=entrada)
+
+# Vista para editar una entrada existente
 @app.route('/editar/<int:id>')
 def editar(id):
-    if not usuario_autenticado():
+    if 'usuario_id' not in session:
         return redirect('/')
-
+    
     entrada = Entrada.get_by_id({'id': id})
+    
+    # Verificamos autoría antes de permitir cargar la pantalla de edición
     if not entrada or entrada.usuario_id != session['usuario_id']:
-        flash("No puedes acceder a esta entrada.", "error")
         return redirect('/dashboard')
-
+        
     return render_template('editar.html', entrada=entrada)
 
-@app.route('/editar/actualizar/<int:id>', methods=['POST'])
+# Procesa los cambios enviados desde el formulario de edición
+@app.route('/actualizar_entrada/<int:id>', methods=['POST'])
 def actualizar_entrada(id):
-    if not usuario_autenticado():
+    if 'usuario_id' not in session:
         return redirect('/')
-
-    entrada = Entrada.get_by_id({'id': id})
-    if not entrada or entrada.usuario_id != session['usuario_id']:
+    
+    entrada_existente = Entrada.get_by_id({'id': id})
+    
+    # Doble chequeo de seguridad por si intentan modificar la URL manualmente
+    if not entrada_existente or entrada_existente.usuario_id != session['usuario_id']:
         return redirect('/dashboard')
-
+        
     if not Entrada.validar_entrada(request.form):
         return redirect(f'/editar/{id}')
-
+    
     data = {
         'id': id,
-        'fecha_entrada': request.form['fecha_entrada'],
-        'notas': request.form['notas'],
-        'usuario_id': session['usuario_id']
+        'fecha': request.form['fecha'],
+        'notas': request.form['notas']
     }
+    
     Entrada.update(data)
     return redirect('/dashboard')
 
+# Borra una entrada
 @app.route('/borrar/<int:id>')
 def borrar(id):
-    if not usuario_autenticado():
+    if 'usuario_id' not in session:
         return redirect('/')
-
-    Entrada.delete({'id': id, 'usuario_id': session['usuario_id']})
+    
+    entrada = Entrada.get_by_id({'id': id})
+    
+    # Aseguramos que solo el dueño original pueda eliminar la entrada
+    if entrada and entrada.usuario_id == session['usuario_id']:
+        Entrada.delete({'id': id})
+        
     return redirect('/dashboard')
 
-@app.route('/ver/<int:id>')
-def ver(id):
-    if not usuario_autenticado():
-        return redirect('/')
-
-    entrada = Entrada.get_by_id({'id': id})
-    if not entrada or entrada.usuario_id != session['usuario_id']:
-        flash("Acceso no autorizado.", "error")
-        return redirect('/dashboard')
-
-    return render_template('ver.html', entrada=entrada)
-
+# Búsqueda por palabra clave dentro del contenido de las notas
 @app.route('/buscar', methods=['POST'])
-def procesar_busqueda():
-    termino = request.form.get('termino', '').strip()
-    return redirect(f'/buscar/{termino}')
-
-@app.route('/buscar/<termino>')
-def buscar(termino=""):
-    if not usuario_autenticado():
+def buscar():
+    if 'usuario_id' not in session:
         return redirect('/')
-
+    
+    termino = request.form['termino']
     data = {
-        'usuario_id': session['usuario_id'],
-        'termino': f"%{termino}%"
+        'termino': termino,
+        'usuario_id': session['usuario_id']
     }
-    resultados = Entrada.buscar_por_notas(data)
-    return render_template('buscar.html', entradas=resultados, termino=termino)
+    
+    entradas = Entrada.search(data)
+    return render_template('buscar.html', entradas=entradas, termino=termino)

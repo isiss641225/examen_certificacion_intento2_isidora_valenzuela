@@ -1,93 +1,90 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Configuración del mapa de caracteres y título de la página -->
     <meta charset="UTF-8">
-    <title>Querido Diario - Login / Registro</title>
-    <!-- Metadato de autoría del proyecto -->
-    <meta name="author" content="isidoravalenzuela@liceovvh.cl">
-    <!-- Enlace a la hoja de estilos CSS estática de la aplicación -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QueridoDiario - Registro e Inicio de Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Hojas de estilo personalizadas de la app -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
-    <!-- Barra de navegación superior centrada -->
-    <div class="nav">
-        <h2>📖 Querido Diario</h2>
-    </div>
+    <div class="container py-5">
+        <h1 class="text-center mb-5">QueridoDiario</h1>
 
-    <!-- Layout en cuadrícula para dividir Registro e Inicio de Sesión -->
-    <div class="grid">
-        <!-- Sección del Formulario de Registro -->
-        <div class="box">
-            <h3>Registro</h3>
-            <!-- Formulario POST que envía los datos del nuevo usuario a la ruta /registro -->
-            <form action="/registro" method="POST">
-                <!-- Campo Nombre -->
-                <div>
-                    <label>Nombre:</label>
-                    <!-- Captura y despliegue de mensajes flash de error para el nombre -->
-                    {% for m in get_flashed_messages(category_filter=["reg_nombre"]) %}
-                        <span class="error">{{ m }}</span>
-                    {% endfor %}
-                    <input type="text" name="nombre" value="{{ reg_data.nombre if reg_data }}">
-                </div>
-                <!-- Campo Apellido -->
-                <div>
-                    <label>Apellido:</label>
-                    <!-- Captura y despliegue de mensajes flash de error para el apellido -->
-                    {% for m in get_flashed_messages(category_filter=["reg_apellido"]) %}
-                        <span class="error">{{ m }}</span>
-                    {% endfor %}
-                    <input type="text" name="apellido" value="{{ reg_data.apellido if reg_data }}">
-                </div>
-                <!-- Campo E-mail -->
-                <div>
-                    <label>E-mail:</label>
-                    <!-- Captura y despliegue de mensajes flash de error para el email -->
-                    {% for m in get_flashed_messages(category_filter=["reg_email"]) %}
-                        <span class="error">{{ m }}</span>
-                    {% endfor %}
-                    <input type="text" name="email" value="{{ reg_data.email if reg_data }}">
-                </div>
-                <!-- Campo Contraseña -->
-                <div>
-                    <label>Contraseña:</label>
-                    <!-- Captura y despliegue de mensajes flash de error para la contraseña -->
-                    {% for m in get_flashed_messages(category_filter=["reg_password"]) %}
-                        <span class="error">{{ m }}</span>
-                    {% endfor %}
-                    <input type="password" name="password">
-                </div>
-                <!-- Campo Confirmación de Contraseña -->
-                <div>
-                    <label>Conf. Contraseña:</label>
-                    <input type="password" name="conf_password">
-                </div>
-                <!-- Botón para procesar el registro -->
-                <button type="submit">Registrar</button>
-            </form>
-        </div>
+        <div class="row g-4 justify-content-center">
+            <!-- Formulario y validaciones para Registro de Usuario -->
+            <div class="col-md-6 col-lg-5">
+                <div class="custom-card p-4">
+                    <h3 class="mb-4 text-center">Registro</h3>
 
-        <!-- Sección del Formulario de Inicio de Sesión -->
-        <div class="box">
-            <h3>Inicio de Sesión</h3>
-            <!-- Despliegue de errores de credenciales al iniciar sesión -->
-            {% for m in get_flashed_messages(category_filter=["login_error"]) %}
-                <span class="error">{{ m }}</span>
-            {% endfor %}
-            <!-- Formulario POST que envía credenciales a la ruta /login -->
-            <form action="/login" method="POST">
-                <div>
-                    <label>E-mail:</label>
-                    <input type="text" name="email" value="{{ login_email if login_email }}">
+                    <!-- Mensajes de error específicos de registro -->
+                    {% with messages = get_flashed_messages(category_filter=["registro"]) %}
+                        {% if messages %}
+                            {% for msg in messages %}
+                                <div class="alert alert-danger py-2 small" role="alert">{{ msg }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form action="/registrar" method="POST">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label fw-semibold">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="apellido" class="form-label fw-semibold">Apellido</label>
+                            <input type="text" class="form-control" id="apellido" name="apellido" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">E-mail</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edad" class="form-label fw-semibold">Edad</label>
+                            <input type="number" class="form-control" id="edad" name="edad" min="18" placeholder="Ingresa tu edad" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-semibold">Contraseña</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label fw-semibold">Conf. Contraseña</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-custom-primary w-100 mt-2">Registrar</button>
+                    </form>
                 </div>
-                <div>
-                    <label>Contraseña:</label>
-                    <input type="password" name="password">
+            </div>
+
+            <!-- Formulario e inicio de sesión de usuarios existentes -->
+            <div class="col-md-6 col-lg-5">
+                <div class="custom-card p-4">
+                    <h3 class="mb-4 text-center">Inicio de Sesión</h3>
+
+                    <!-- Mensajes de error específicos de login -->
+                    {% with messages = get_flashed_messages(category_filter=["login"]) %}
+                        {% if messages %}
+                            {% for msg in messages %}
+                                <div class="alert alert-danger py-2 small" role="alert">{{ msg }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form action="/login" method="POST">
+                        <div class="mb-3">
+                            <label for="login_email" class="form-label fw-semibold">E-mail</label>
+                            <input type="email" class="form-control" id="login_email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="login_password" class="form-label fw-semibold">Contraseña</label>
+                            <input type="password" class="form-control" id="login_password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-custom-primary w-100 mt-2">Iniciar Sesión</button>
+                    </form>
                 </div>
-                <!-- Botón para iniciar sesión -->
-                <button type="submit">Iniciar Sesión</button>
-            </form>
+            </div>
         </div>
     </div>
 </body>
